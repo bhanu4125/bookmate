@@ -6,7 +6,9 @@ import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import RatingHistogram from "@/components/books/RatingHistogram";
-import RatingStars from "@/components/books/RatingStars";
+import DynamicRatingInput from "@/components/books/DynamicRatingInput";
+import ReadingStatusToggle from "@/components/books/ReadingStatusToggle";
+import { ReadingStatus } from "@/types";
 import { useAuth } from "@/context/AuthContext";
 import {
   BookOpen,
@@ -34,6 +36,8 @@ export default function BookDetailPage() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [revealedSpoilers, setRevealedSpoilers] = useState<Record<string, boolean>>({});
+  const [userRating, setUserRating] = useState<number>(0);
+  const [userStatus, setUserStatus] = useState<ReadingStatus | null>(null);
 
   const fetchBook = useCallback(async () => {
     try {
@@ -41,6 +45,10 @@ export default function BookDetailPage() {
       if (res.ok) {
         const json = await res.json();
         setData(json);
+        if (json.userActivity) {
+          setUserRating(json.userActivity.rating || 0);
+          setUserStatus(json.userActivity.status || null);
+        }
       }
     } catch (err) {
       console.error(err);
@@ -48,6 +56,69 @@ export default function BookDetailPage() {
       setLoading(false);
     }
   }, [slug]);
+
+  const handleStatusChange = async (newStatus: ReadingStatus) => {
+    if (!user) {
+      toast.error("Please sign in to log your reading status");
+      return;
+    }
+
+    const previous = userStatus;
+    setUserStatus(newStatus);
+
+    try {
+      const res = await fetch("/api/logs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bookId: data.book._id,
+          status: newStatus,
+        }),
+      });
+
+      if (!res.ok) {
+        setUserStatus(previous);
+        toast.error("Failed to update status");
+      } else {
+        toast.success(`Marked as ${newStatus.replace(/-/g, " ")}`);
+      }
+    } catch {
+      setUserStatus(previous);
+      toast.error("Failed to update status");
+    }
+  };
+
+  const handleRatingChange = async (newRating: number) => {
+    if (!user) {
+      toast.error("Please sign in to rate this book");
+      return;
+    }
+
+    const prev = userRating;
+    setUserRating(newRating);
+
+    try {
+      const res = await fetch("/api/logs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bookId: data.book._id,
+          rating: newRating,
+        }),
+      });
+
+      if (!res.ok) {
+        setUserRating(prev);
+        toast.error("Failed to record rating");
+      } else {
+        toast.success(newRating > 0 ? `Rated ${newRating} stars!` : "Rating cleared");
+        fetchBook();
+      }
+    } catch {
+      setUserRating(prev);
+      toast.error("Failed to record rating");
+    }
+  };
 
   useEffect(() => {
     if (slug) {
@@ -326,8 +397,58 @@ export default function BookDetailPage() {
             </section>
           </div>
 
-          {/* Right Column: Rating Histogram & Featured Lists */}
+          {/* Right Column: Your Activity, Rating Histogram & Featured Lists */}
           <div className="lg:col-span-4 space-y-8">
+            {/* "YOUR ACTIVITY" LETTERBOXD-STYLE PANEL */}
+            <div className="p-5 rounded-2xl glass-panel border border-white/10 space-y-5 bg-background-card/80">
+              <div className="flex items-center justify-between pb-3 border-b border-white/5">
+                <span className="text-xs uppercase tracking-wider text-parchment-muted font-bold font-sans">
+                  Your Activity
+                </span>
+                {user ? (
+                  <span className="text-[11px] text-emerald font-semibold flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5" /> Synced
+                  </span>
+                ) : (
+                  <Link href="/login" className="text-[11px] text-gold hover:underline">
+                    Sign in to log
+                  </Link>
+                )}
+              </div>
+
+              {/* Status Toggle */}
+              <div className="space-y-2">
+                <p className="text-[11px] uppercase tracking-wider text-parchment-muted font-sans font-semibold">
+                  Reading Status
+                </p>
+                <ReadingStatusToggle
+                  currentStatus={userStatus}
+                  onChange={handleStatusChange}
+                  disabled={!user}
+                />
+              </div>
+
+              {/* Dynamic Half-Star Rating Input */}
+              <div className="space-y-2 pt-2 border-t border-white/5">
+                <p className="text-[11px] uppercase tracking-wider text-parchment-muted font-sans font-semibold">
+                  Your Rating
+                </p>
+                <DynamicRatingInput
+                  value={userRating}
+                  onChange={handleRatingChange}
+                  size="lg"
+                />
+              </div>
+
+              {/* Log/Review deep dive link */}
+              <Link
+                href={`/book/${book.slug || book._id}/log`}
+                className="w-full py-2.5 rounded-xl bg-background-elevated hover:bg-background-border border border-white/10 text-parchment-100 text-xs uppercase tracking-wider font-bold flex items-center justify-center gap-2 transition-colors"
+              >
+                <span>Write Full Review / Diary Log</span>
+              </Link>
+            </div>
+
             {/* Letterboxd-style Rating Histogram */}
             <RatingHistogram
               distribution={
