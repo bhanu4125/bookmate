@@ -49,3 +49,4 @@ export const Review: Model<IReview> =
   mongoose.models.Review || mongoose.model<IReview>("Review", ReviewSchema);
 
 export default Review;
+

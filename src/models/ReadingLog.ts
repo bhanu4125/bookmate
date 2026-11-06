@@ -51,3 +51,4 @@ export const ReadingLog: Model<IReadingLog> =
   mongoose.models.ReadingLog || mongoose.model<IReadingLog>("ReadingLog", ReadingLogSchema);
 
 export default ReadingLog;
+

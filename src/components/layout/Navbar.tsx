@@ -256,3 +256,4 @@ export default function Navbar({ onOpenSearch, onOpenLogModal }: NavbarProps) {
     </header>
   );
 }
+

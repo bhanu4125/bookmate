@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { List } from "@/models/List";
 import { getCurrentUser } from "@/lib/auth";
+import mongoose from "mongoose";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { slug: string } }
 ) {
   try {
     const user = await getCurrentUser();
@@ -13,10 +14,14 @@ export async function POST(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = params;
+    const { slug } = params;
     await connectToDatabase();
 
-    const originalList = await List.findById(id);
+    const isObjectId = mongoose.Types.ObjectId.isValid(slug);
+    const originalList = await List.findOne({
+      $or: [{ slug }, ...(isObjectId ? [{ _id: slug }] : [])],
+    });
+
     if (!originalList) {
       return NextResponse.json({ error: "List not found" }, { status: 404 });
     }
@@ -44,3 +49,4 @@ export async function POST(
     );
   }
 }
+

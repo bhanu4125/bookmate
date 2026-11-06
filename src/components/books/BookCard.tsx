@@ -168,3 +168,4 @@ export default function BookCard({ book, onLogClick }: BookCardProps) {
     </div>
   );
 }
+

@@ -6,6 +6,7 @@ import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import RatingHistogram from "@/components/books/RatingHistogram";
+import RatingStars from "@/components/books/RatingStars";
 import DynamicRatingInput from "@/components/books/DynamicRatingInput";
 import ReadingStatusToggle from "@/components/books/ReadingStatusToggle";
 import ReviewCard from "@/components/reviews/ReviewCard";

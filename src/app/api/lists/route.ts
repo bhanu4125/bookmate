@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+
+export const dynamic = "force-dynamic";
 import { connectToDatabase } from "@/lib/mongodb";
 import { List } from "@/models/List";
 import { getCurrentUser } from "@/lib/auth";
@@ -80,3 +82,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+

@@ -28,3 +28,4 @@ export interface UserSession {
   avatarUrl?: string;
   bio?: string;
 }
+

@@ -50,3 +50,4 @@ export const List: Model<IList> =
   mongoose.models.List || mongoose.model<IList>("List", ListSchema);
 
 export default List;
+

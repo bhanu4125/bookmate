@@ -51,3 +51,4 @@ export async function getCurrentUser(): Promise<IUser | null> {
     return null;
   }
 }
+

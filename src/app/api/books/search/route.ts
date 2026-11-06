@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+
+export const dynamic = "force-dynamic";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Book } from "@/models/Book";
 import { searchOpenLibrary } from "@/services/bookService";
@@ -62,3 +64,4 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+

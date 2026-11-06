@@ -43,3 +43,4 @@ export default function BookLogPage() {
     </div>
   );
 }
+

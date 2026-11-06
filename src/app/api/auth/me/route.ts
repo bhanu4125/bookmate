@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+
+export const dynamic = "force-dynamic";
 import { getCurrentUser } from "@/lib/auth";
 
 export async function GET() {
@@ -30,3 +32,4 @@ export async function GET() {
     return NextResponse.json({ user: null }, { status: 500 });
   }
 }
+
