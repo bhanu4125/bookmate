@@ -8,6 +8,7 @@ import Footer from "@/components/layout/Footer";
 import RatingHistogram from "@/components/books/RatingHistogram";
 import DynamicRatingInput from "@/components/books/DynamicRatingInput";
 import ReadingStatusToggle from "@/components/books/ReadingStatusToggle";
+import ReviewCard from "@/components/reviews/ReviewCard";
 import { ReadingStatus } from "@/types";
 import { useAuth } from "@/context/AuthContext";
 import {
@@ -305,87 +306,9 @@ export default function BookDetailPage() {
 
               {reviews && reviews.length > 0 ? (
                 <div className="space-y-6">
-                  {reviews.map((rev: any) => {
-                    const isSpoilerHidden = rev.containsSpoilers && !revealedSpoilers[rev._id];
-
-                    return (
-                      <div
-                        key={rev._id}
-                        className="p-6 rounded-2xl glass-panel border border-white/10 space-y-4"
-                      >
-                        {/* Reviewer Header */}
-                        <div className="flex items-center justify-between">
-                          <Link
-                            href={`/profile/${rev.user?.username}`}
-                            className="flex items-center gap-3 group"
-                          >
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={rev.user?.avatarUrl || `https://avatar.vercel.sh/${rev.user?.username}.png`}
-                              alt={rev.user?.name}
-                              className="w-10 h-10 rounded-full object-cover border border-white/15"
-                            />
-                            <div>
-                              <p className="text-sm font-semibold text-parchment-100 group-hover:text-gold transition-colors">
-                                {rev.user?.name}
-                              </p>
-                              <p className="text-[11px] text-parchment-muted">
-                                @{rev.user?.username} • {formatRelativeTime(rev.createdAt)}
-                              </p>
-                            </div>
-                          </Link>
-
-                          {rev.rating && (
-                            <RatingStars rating={rev.rating} size="sm" showValue />
-                          )}
-                        </div>
-
-                        {/* Spoiler Masking */}
-                        {rev.containsSpoilers && (
-                          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-xs text-amber-300">
-                            <AlertTriangle className="w-3.5 h-3.5" />
-                            <span>This review contains spoilers.</span>
-                            <button
-                              type="button"
-                              onClick={() => toggleSpoiler(rev._id)}
-                              className="ml-auto underline font-semibold text-amber-200 hover:text-white"
-                            >
-                              {revealedSpoilers[rev._id] ? "Hide spoilers" : "Reveal spoilers"}
-                            </button>
-                          </div>
-                        )}
-
-                        {/* Review Content */}
-                        <div
-                          className={`text-sm text-parchment-200 leading-relaxed font-sans whitespace-pre-line ${
-                            isSpoilerHidden ? "filter blur-sm select-none" : ""
-                          }`}
-                        >
-                          {rev.content}
-                        </div>
-
-                        {/* Quotes Highlight */}
-                        {rev.quotes && rev.quotes.length > 0 && (
-                          <div className="border-l-2 border-gold pl-4 py-1 italic text-xs text-parchment-muted font-serif">
-                            “{rev.quotes[0]}”
-                          </div>
-                        )}
-
-                        {/* Footer: Like action */}
-                        <div className="pt-3 border-t border-white/5 flex items-center justify-between text-xs text-parchment-muted">
-                          <button
-                            type="button"
-                            onClick={() => handleLikeReview(rev._id)}
-                            className="flex items-center gap-1.5 hover:text-red-400 transition-colors"
-                          >
-                            <Heart className="w-3.5 h-3.5" />
-                            <span>{rev.likes?.length || 0} Likes</span>
-                          </button>
-                          <span>{rev.comments?.length || 0} Comments</span>
-                        </div>
-                      </div>
-                    );
-                  })}
+                  {reviews.map((rev: any) => (
+                    <ReviewCard key={rev._id} review={rev} />
+                  ))}
                 </div>
               ) : (
                 <div className="py-12 text-center rounded-2xl glass-panel border border-white/5 p-8">
