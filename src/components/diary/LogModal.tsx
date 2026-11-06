@@ -6,6 +6,7 @@ import DynamicRatingInput from "@/components/books/DynamicRatingInput";
 import { BookFormat, ReadingStatus } from "@/types";
 import { toast } from "sonner";
 import confetti from "canvas-confetti";
+import { playChimeSound } from "@/lib/sound";
 
 interface LogModalProps {
   isOpen: boolean;
@@ -136,6 +137,7 @@ export default function LogModal({
       }
 
       // Confetti burst on successful log!
+      playChimeSound();
       confetti({
         particleCount: 80,
         spread: 60,

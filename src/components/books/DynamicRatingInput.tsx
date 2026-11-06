@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Star } from "lucide-react";
+import { playPopSound } from "@/lib/sound";
 
 interface DynamicRatingInputProps {
   value: number; // 0 to 5 in 0.5 steps
@@ -51,6 +52,7 @@ export default function DynamicRatingInput({
     const x = e.clientX - rect.left;
     const isLeftHalf = x < rect.width / 2;
     const newRating = isLeftHalf ? starIndex + 0.5 : starIndex + 1.0;
+    playPopSound();
     // If clicking same rating, clear to 0
     onChange(value === newRating ? 0 : newRating);
   };
